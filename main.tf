@@ -38,3 +38,23 @@ resource "null_resource" "WAIT_HOST_FOR_SSH_CONNECTION" {
         EOF
     }
 }
+
+resource "null_resource" "SET_SSH_PRI_KEY_FROM_S3_FILE_TO_GIT_ACTION_RUNNER" {
+    count = (var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.S3_FILE != "" ? 1 : 0)
+    
+    triggers = {
+        always_run = timestamp()
+    }
+    provisioner "local-exec" {
+        interpreter = ["bash", "-c"]
+        command = <<-EOF
+            mkdir -p ${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA_RUNNER_DIR}
+            chmod -R 777 ${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA_RUNNER_DIR}
+            aws s3 cp "s3://${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.S3_FILE}" "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_FILE}"  --profile ${var.PROFILE}
+            while [ ! -f "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_FILE}" ]; do
+                sleep 3
+            done
+            chmod 400 "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_FILE}"
+        EOF
+    }
+}
