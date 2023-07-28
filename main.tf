@@ -20,10 +20,10 @@ resource "null_resource" "WAIT_HOST_FOR_SSH_CONNECTION" {
         interpreter = ["bash", "-c"]
         command = <<-EOF
 
-        if [[ -n "${var.SSH_HOST_DATA.SSH_PRI_KEY[count.index]}" ]] && [[ -n "${var.SSH_HOST_DATA.SSH_HOST_USER[count.index]}" ]] && [[ -n "${var.SSH_HOST_DATA.SSH_HOST_IP[count.index]}" ]]; then
-            SSH_PRI_KEY="${var.SSH_HOST_DATA.SSH_PRI_KEY[count.index]}"
-            SSH_HOST_USER="${var.SSH_HOST_DATA.SSH_HOST_USER[count.index]}"
-            SSH_HOST_IP="${var.SSH_HOST_DATA.SSH_HOST_IP[count.index]}"
+        if [[ -n "${var.SSH_HOST_DATA.SSH_PRI_KEYs[count.index]}" ]] && [[ -n "${var.SSH_HOST_DATA.SSH_HOST_USERs[count.index]}" ]] && [[ -n "${var.SSH_HOST_DATA.SSH_HOST_IPs[count.index]}" ]]; then
+            SSH_PRI_KEY="${var.SSH_HOST_DATA.SSH_PRI_KEYs[count.index]}"
+            SSH_HOST_USER="${var.SSH_HOST_DATA.SSH_HOST_USERs[count.index]}"
+            SSH_HOST_IP="${var.SSH_HOST_DATA.SSH_HOST_IPs[count.index]}"
             echo "Waiting for the remote PC to reboot and SSH to become available..."
             while true; do
                 if ssh -q -o "StrictHostKeyChecking=no" -i "$SSH_PRI_KEY" "$SSH_HOST_USER@$SSH_HOST_IP" exit; then
