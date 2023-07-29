@@ -19,8 +19,8 @@ resource "null_resource" "PRI_KEY_FILE_FROM_S3_TO_RUNNER" {
         interpreter = ["bash", "-c"]
         on_failure = continue # Add this line to ignore errors
         command = <<-EOF
-            mkdir -p "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_DIR}"
-            chmod -R 777 "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_DIR}" || true
+            # mkdir -p "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_DIR}"
+            # chmod -R 777 "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_DIR}" || true
             if [[ ! -f "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}" ]] then
                 aws s3 cp "s3://${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.S3_PRI_KEY_FILE}" "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}"  --profile ${var.PROFILE}
             fi
