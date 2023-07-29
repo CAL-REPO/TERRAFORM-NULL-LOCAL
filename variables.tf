@@ -3,7 +3,7 @@ variable "PROFILE" {
     default = null
 }
 
-variable "SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA" {
+variable "PRI_KEY_FILE_FROM_S3_TO_RUNNER" {
     type = object({
         S3_PRI_KEY_FILE = string
         RUNNER_DIR = string
@@ -17,16 +17,16 @@ variable "SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA" {
     }
 }
 
-variable "SSH_HOST_DATA" {
+variable "WAIT_REMOTE_HOST_FOR_CONNECTION" {
     type = object({
-        SSH_PRI_KEY_FILE = string
-        SSH_HOST_USER = string
-        SSH_HOST_IP = string
+        LOCAL_HOST_PRI_KEY_FILE = string
+        REMOTE_HOST_USER = string
+        REMOTE_HOST_IP = string
     })
 
     default = {
-        SSH_PRI_KEY_FILE = ""
-        SSH_HOST_USER = ""
-        SSH_HOST_IP = ""
+        LOCAL_HOST_PRI_KEY_FILE = ""
+        REMOTE_HOST_USER = ""
+        REMOTE_HOST_IP = ""
     }
 }
