@@ -20,13 +20,13 @@ resource "null_resource" "SET_SSH_PRI_KEY_FROM_S3_FILE_TO_GIT_ACTION_RUNNER" {
         command = <<-EOF
             mkdir -p "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_DIR}"
             chmod -R 777 "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_DIR}"
-            if [[ ! -f "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_FILE}" ]] then
-                aws s3 cp "s3://${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.S3_PRI_KEY_FILE}" "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_FILE}"  --profile ${var.PROFILE}
+            if [[ ! -f "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_PRI_KEY_FILE}" ]] then
+                aws s3 cp "s3://${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.S3_PRI_KEY_FILE}" "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_PRI_KEY_FILE}"  --profile ${var.PROFILE}
             fi
-            while [ ! -f "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_FILE}" ]; do
+            while [ ! -f "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_PRI_KEY_FILE}" ]; do
                 sleep 3
             done
-            chmod 400 "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_FILE}"
+            chmod 400 "${var.SSH_PRI_KEY_FROM_S3_TO_RUNNER_DATA.RUNNER_PRI_KEY_FILE}"
         EOF
     }
 }
