@@ -17,9 +17,13 @@ resource "null_resource" "PRI_KEY_FILE_FROM_S3_TO_RUNNER" {
 
     provisioner "local-exec" {
         interpreter = ["bash", "-c"]
+        on_failure = continue # Add this line to ignore errors
         command = <<-EOF
             aws s3 cp "s3://${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.S3_PRI_KEY_FILE}" "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}"  --profile ${var.PROFILE}
             chmod 400 "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}"
+            ls -al /home/runner
+            sudo chmod 400 "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}"
+            ls -al /home/runner
             mkdir -p "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_DIR}"
             chmod -R 777 "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_DIR}"
             if [[ ! -f "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}" ]] then
@@ -31,7 +35,6 @@ resource "null_resource" "PRI_KEY_FILE_FROM_S3_TO_RUNNER" {
             echo "test"
             chmod 400 "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}"
         EOF
-        on_failure = continue # Add this line to ignore errors
     }
 }
 
