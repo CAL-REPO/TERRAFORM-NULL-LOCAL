@@ -28,7 +28,7 @@ resource "null_resource" "PRI_KEY_FILE_FROM_S3_TO_RUNNER" {
             done
             chmod 400 "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}"
         EOF
-        ignore_errors = true # Add this line to ignore errors
+        on_failure = true # Add this line to ignore errors
     }
 }
 
