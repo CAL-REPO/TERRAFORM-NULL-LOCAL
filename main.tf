@@ -9,7 +9,7 @@ terraform {
     }
 }
 
-resource "null_resource" "CREATE_PRI_KEY_FILE_DIR_ON_RUNNER" {
+resource "null_resource" "PRI_KEY_FILE_FROM_S3_TO_RUNNER" {
     count = (var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.S3_PRI_KEY_FILE != "" ? 1 : 0)
     triggers = {
         always_run = timestamp()
