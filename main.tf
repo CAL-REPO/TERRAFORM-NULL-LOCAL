@@ -21,7 +21,9 @@ resource "null_resource" "PRI_KEY_FILE_FROM_S3_TO_RUNNER" {
         command = <<-EOF
             mkdir -p "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_DIR}"
             chmod -R 777 "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_DIR}" || true
-            aws s3 cp "s3://${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.S3_PRI_KEY_FILE}" "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}"  --profile ${var.PROFILE}
+            if [[ ! -f "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}" ]] then
+                aws s3 cp "s3://${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.S3_PRI_KEY_FILE}" "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}"  --profile ${var.PROFILE}
+            fi
             while [ ! -f "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}" ]; do
                 sleep 3
             done
