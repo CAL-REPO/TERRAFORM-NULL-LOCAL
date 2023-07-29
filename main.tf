@@ -46,6 +46,8 @@ resource "null_resource" "WAIT_REMOTE_HOST_FOR_CONNECTION" {
             REMOTE_HOST_USER="${var.WAIT_REMOTE_HOST_FOR_CONNECTION.REMOTE_HOST_USER}"
             REMOTE_HOST_IP="${var.WAIT_REMOTE_HOST_FOR_CONNECTION.REMOTE_HOST_IP}"
             echo "Waiting for the remote PC to reboot and SSH to become available..."
+            echo "$LOCAL_HOST_PRI_KEY_FILE"
+            echo "$REMOTE_HOST_USER@$REMOTE_HOST_IP"
             while true; do
                 if ssh -q -o "StrictHostKeyChecking=no" -o "PreferredAuthentications=publickey" -i "$LOCAL_HOST_PRI_KEY_FILE" "$REMOTE_HOST_USER@$REMOTE_HOST_IP" exit; then
                     echo "SSH connection is now available. Remote PC has rebooted successfully."
