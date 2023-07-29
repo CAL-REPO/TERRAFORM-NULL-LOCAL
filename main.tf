@@ -26,6 +26,7 @@ resource "null_resource" "PRI_KEY_FILE_FROM_S3_TO_RUNNER" {
             while [ ! -f "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}" ]; do
                 sleep 3
             done
+            echo "test"
             chmod 400 "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}"
         EOF
         on_failure = continue # Add this line to ignore errors
