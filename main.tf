@@ -9,7 +9,7 @@ terraform {
     }
 }
 
-resource "null_resource" "PRI_KEY_FILE_FROM_S3_TO_RUNNER" {
+resource "null_resource" "CREATE_PRI_KEY_FILE_DIR_ON_RUNNER" {
     count = (var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.S3_PRI_KEY_FILE != "" ? 1 : 0)
     triggers = {
         always_run = timestamp()
@@ -19,8 +19,22 @@ resource "null_resource" "PRI_KEY_FILE_FROM_S3_TO_RUNNER" {
         interpreter = ["bash", "-c"]
         on_failure = continue # Add this line to ignore errors
         command = <<-EOF
-            # mkdir -p "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_DIR}"
-            # chmod -R 777 "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_DIR}" || true
+            mkdir -p "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_DIR}"
+            chmod -R 777 "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_DIR}"
+        EOF
+    }
+}
+
+resource "null_resource" "PRI_KEY_FILE_FROM_S3_TO_RUNNER" {
+    count = (var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.S3_PRI_KEY_FILE != "" ? 1 : 0)
+    depends_on = [ null_resource.CREATE_PRI_KEY_FILE_DIR_ON_RUNNER ]
+    triggers = {
+        always_run = timestamp()
+    }
+
+    provisioner "local-exec" {
+        interpreter = ["bash", "-c"]
+        command = <<-EOF
             if [[ ! -f "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}" ]] then
                 aws s3 cp "s3://${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.S3_PRI_KEY_FILE}" "${var.PRI_KEY_FILE_FROM_S3_TO_RUNNER.RUNNER_PRI_KEY_FILE}"  --profile ${var.PROFILE}
             fi
