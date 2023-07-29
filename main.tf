@@ -37,7 +37,7 @@ resource "null_resource" "WAIT_REMOTE_HOST_FOR_CONNECTION" {
     triggers = {
         always_run = timestamp()
     }
-
+    
     provisioner "local-exec" {
         interpreter = ["bash", "-c"]
         command = <<-EOF
