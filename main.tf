@@ -30,7 +30,7 @@ resource "null_resource" "EXECUTE_SCRIPT" {
 
     triggers = {
         always_run    = try("${each.value.ALWAYS}" == true ? timestamp() : null, null)
-        destroy       = try("${each.value.DESTROY}" == true ? destroy : null, null)
+        destroy       = "${each.value.DESTROY}" == true ? destroy : "${each.value.ALWAYS}" == true ? always : create
         PRE_COMMAND   = try(data.template_file.PRE_COMMAND_SCRIPT[each.key].rendered, "")
         VARIANT       = try(join(",", "${each.value.VARIANTs}"), "")
         NAME          = try(file("${each.value.NAME}"), null)
