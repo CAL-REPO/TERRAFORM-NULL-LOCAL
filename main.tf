@@ -16,7 +16,7 @@ resource "null_resource" "EXECUTE_SCRIPT" {
         always_run      = try("${each.value.ALWAYS}" == true ? timestamp() : null, null)
         PRE_COMMAND     = try(join(",", "${each.value.PRE_COMMAND}"), null)
         VARAIANT        = try(join(",", "${each.value.VARIANTs}"), null)
-        NAME            = file("${each.value.NAME}")
+        NAME            = try(file("${each.value.NAME}"), null)
         POST_COMMAND    = try(join(",", "${each.value.PRE_COMMAND}"), null)
     }
 
@@ -30,7 +30,7 @@ resource "null_resource" "EXECUTE_SCRIPT" {
             %{ endfor ~}
         %{ endif ~}
         bash "${each.value.NAME}"
-        "${each.value.PRE_COMMAND}"
+        "${each.value.POST_COMMAND}"
         EOF
     }
 }

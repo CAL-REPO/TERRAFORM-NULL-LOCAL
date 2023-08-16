@@ -6,8 +6,10 @@ variable "PROFILE" {
 variable "SCRIPTs" {
     type = list(object({
         ALWAYS = optional(bool)
-        NAME = string
+        PRE_COMMAND = optional(string)
+        NAME = optional(string)
         VARIANTs = optional(list(string))
+        POST_COMMAND = optional(string)
     }))
     default = []
 }
