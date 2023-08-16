@@ -33,10 +33,10 @@ resource "null_resource" "EXECUTE_SCRIPT" {
 
     triggers = {
         always_run      = try("${var.SCRIPTs[count.index].ALWAYS}" == true ? timestamp() : null, null)
-        PRE_COMMAND_SCRIPT = try("${data.template_file.SCRIPT[count.index].rendered}", null)
+        PRE_COMMAND_SCRIPT = try("${data.template_file.PRE_COMMAND_SCRIPT[count.index].rendered}", null)
         VARAIANT        = try(join(",", "${var.SCRIPTs[count.index].VARIANTs}"), [])
         NAME            = try(file("${var.SCRIPTs[count.index].NAME}"), null)
-        POST_COMMAND_SCRIPT = try("${data.template_file.SCRIPT[count.index].rendered}",null)
+        POST_COMMAND_SCRIPT = try("${data.template_file.POST_COMMAND_SCRIPT[count.index].rendered}",null)
     }
 
     provisioner "local-exec" {
