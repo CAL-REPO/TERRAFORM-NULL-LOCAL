@@ -10,7 +10,7 @@ terraform {
 }
 
 data "template_file" "PRE_COMMAND_SCRIPT" {
-    for_each = { for index, SCRIPT in var.SCRIPTs : index => SCRIPT }
+    for_each = { for index, SCRIPT in var.APPLY_SCRIPTs : index => SCRIPT }
 
     template = <<-EOF
         ${try("${base64encode("${each.value.PRE_COMMAND}")}", "")}
@@ -18,7 +18,23 @@ data "template_file" "PRE_COMMAND_SCRIPT" {
 }
 
 data "template_file" "POST_COMMAND_SCRIPT" {
-    for_each = { for index, SCRIPT in var.SCRIPTs : index => SCRIPT }
+    for_each = { for index, SCRIPT in var.APPLY_SCRIPTs : index => SCRIPT }
+
+    template = <<-EOF
+        ${try("${base64encode("${each.value.POST_COMMAND}")}", "")}
+    EOF
+}
+
+data "template_file" "PRE_COMMAND_SCRIPT" {
+    for_each = { for index, SCRIPT in var.DESTROY_SCRIPTs : index => SCRIPT }
+
+    template = <<-EOF
+        ${try("${base64encode("${each.value.PRE_COMMAND}")}", "")}
+    EOF
+}
+
+data "template_file" "POST_COMMAND_SCRIPT" {
+    for_each = { for index, SCRIPT in var.DESTROY_SCRIPTs : index => SCRIPT }
 
     template = <<-EOF
         ${try("${base64encode("${each.value.POST_COMMAND}")}", "")}
