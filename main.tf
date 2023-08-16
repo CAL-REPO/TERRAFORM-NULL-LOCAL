@@ -12,13 +12,13 @@ terraform {
 data "template_file" "SCRIPT" {
     for_each = { for index, SCRIPT in var.SCRIPTs : index => SCRIPT }
 
-    triggers = {
-        always_run      = try("${each.value.ALWAYS}" == true ? timestamp() : null, null)
-        PRE_COMMAND     = try("${each.value.PRE_COMMAND}", "")
-        VARAIANT        = try(join(",", "${each.value.VARIANTs}"), [])
-        NAME            = try(file("${each.value.NAME}"), null)
-        POST_COMMAND    = try("${each.value.PRE_COMMAND}", "")
-    }
+    # triggers = {
+    #     always_run      = try("${each.value.ALWAYS}" == true ? timestamp() : null, null)
+    #     PRE_COMMAND     = try("${each.value.PRE_COMMAND}", "")
+    #     VARAIANT        = try(join(",", "${each.value.VARIANTs}"), [])
+    #     NAME            = try(file("${each.value.NAME}"), null)
+    #     POST_COMMAND    = try("${each.value.PRE_COMMAND}", "")
+    # }
 
     template = <<-EOF
     ${each.value.PRE_COMMAND}
