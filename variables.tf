@@ -6,6 +6,7 @@ variable "PROFILE" {
 variable "SCRIPTs" {
     type = list(object({
         ALWAYS = optional(bool)
+        DESTROY = optional(bool)
         PRE_COMMAND = optional(string)
         NAME = optional(string)
         VARIANTs = optional(list(string))
