@@ -29,14 +29,17 @@ resource "null_resource" "EXECUTE_SCRIPT" {
     for_each = { for index, SCRIPT in var.SCRIPTs : index => SCRIPT }
 
     triggers = {
-        always_run    = try(each.value.ALWAYS == true ? timestamp() : null, null)
+        always_run    = try("${each.value.ALWAYS}" == true ? timestamp() : null, null)
+        destroy       = try("${each.value.DESTROY}" == true ? destroy : null, null)
         PRE_COMMAND   = try(data.template_file.PRE_COMMAND_SCRIPT[each.key].rendered, "")
-        VARIANT       = try(join(",", each.value.VARIANTs), "")
-        NAME          = try(file(each.value.NAME), null)
+        VARIANT       = try(join(",", "${each.value.VARIANTs}"), "")
+        NAME          = try(file("${each.value.NAME}"), null)
         POST_COMMAND  = try(data.template_file.POST_COMMAND_SCRIPT[each.key].rendered, "")
     }
 
     provisioner "local-exec" {
+        when    = "${self.triggers.destroy}"
+        interpreter = ["bash", "-c"]
         command = <<-EOF
             %{ if self.triggers.PRE_COMMAND != "" ~}
                 echo "${self.triggers.PRE_COMMAND}" | base64 --decode | bash -s
@@ -53,6 +56,5 @@ resource "null_resource" "EXECUTE_SCRIPT" {
                 echo "${self.triggers.POST_COMMAND}" | base64 --decode | bash -s
             %{ endif ~}
         EOF 
-        interpreter = ["bash", "-c"]
     }
 }
