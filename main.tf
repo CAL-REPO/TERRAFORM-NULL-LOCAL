@@ -31,7 +31,7 @@ resource "null_resource" "EXECUTE_SCRIPT" {
     triggers = {
         always_run      = try("${each.value.ALWAYS}" == true ? timestamp() : null, null)
         PRE_COMMAND     = try("${each.value.PRE_COMMAND}", "")
-        VARAIANT        = try(join(",", "${each.value.VARIANTs}"), "")
+        VARIANT        = try(join(",", "${each.value.VARIANTs}"), "")
         NAME            = try(file("${each.value.NAME}"), null)
         POST_COMMAND    = try("${each.value.POST_COMMAND}", "")
     }
