@@ -14,7 +14,7 @@ data "template_file" "PRE_COMMAND_SCRIPT" {
             length(var.SCRIPTs) : 0)
 
     template = <<-EOF
-    ${var.SCRIPTs[count.index].PRE_COMMAND}
+    ${try(var.SCRIPTs[count.index].PRE_COMMAND, "")}
     EOF
 }
 
@@ -23,7 +23,7 @@ data "template_file" "POST_COMMAND_SCRIPT" {
             length(var.SCRIPTs) : 0)
 
     template = <<-EOF
-    ${var.SCRIPTs[count.index].POST_COMMAND}
+    ${try(var.SCRIPTs[count.index].POST_COMMAND, "")}
     EOF
 }
 
@@ -33,17 +33,15 @@ resource "null_resource" "EXECUTE_SCRIPT" {
 
     triggers = {
         always_run      = try("${var.SCRIPTs[count.index].ALWAYS}" == true ? timestamp() : null, null)
-        PRE_COMMAND_SCRIPT = try("${data.template_file.PRE_COMMAND_SCRIPT[count.index].rendered}", null)
-        VARAIANT        = try(join(",", "${var.SCRIPTs[count.index].VARIANTs}"), [])
+        PRE_COMMAND_SCRIPT = try("${data.template_file.PRE_COMMAND_SCRIPT[count.index].rendered}", "")
+        VARIANTs        = try(join(",", "${var.SCRIPTs[count.index].VARIANTs}"), [])
         NAME            = try(file("${var.SCRIPTs[count.index].NAME}"), null)
-        POST_COMMAND_SCRIPT = try("${data.template_file.POST_COMMAND_SCRIPT[count.index].rendered}",null)
+        POST_COMMAND_SCRIPT = try("${data.template_file.POST_COMMAND_SCRIPT[count.index].rendered}","")
     }
 
     provisioner "local-exec" {
         command = <<-EOF
-        %{ if "${self.triggers.PRE_COMMAND_SCRIPT}" != null ~}
-        bash ${data.template_file.PRE_COMMAND_SCRIPT[count.index]}
-        %{ endif ~}
+        ${self.triggers.PRE_COMMAND_SCRIPT}
         %{ if length("${self.triggers.VARIANTs}") > 0 ~}
             %{ for VARIANT in "${var.SCRIPTs[count.index].VARIANTs}" ~}
             export ${VARIANT}
@@ -52,9 +50,7 @@ resource "null_resource" "EXECUTE_SCRIPT" {
         %{ if "${self.triggers.NAME}" != null ~}
             bash "${var.SCRIPTs[count.index].NAME}"
         %{ endif ~}
-        %{ if "${self.triggers.POST_COMMAND_SCRIPT}" != null ~}
-        bash ${data.template_file.POST_COMMAND_SCRIPT[count.index]}
-        %{ endif ~}
+        ${self.triggers.POST_COMMAND_SCRIPT}
         EOF 
         interpreter = ["bash", "-c"]
     }
