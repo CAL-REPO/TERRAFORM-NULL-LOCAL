@@ -14,10 +14,10 @@ resource "null_resource" "EXECUTE_SCRIPT" {
 
     triggers = {
         always_run      = try("${each.value.ALWAYS}" == true ? timestamp() : null, null)
-        PRE_COMMAND     = try(join(",", "${each.value.PRE_COMMAND}"), null)
-        VARAIANT        = try(join(",", "${each.value.VARIANTs}"), null)
+        PRE_COMMAND     = try(join(",", "${each.value.PRE_COMMAND}"), "")
+        VARAIANT        = try(join(",", "${each.value.VARIANTs}"), [])
         NAME            = try(file("${each.value.NAME}"), null)
-        POST_COMMAND    = try(join(",", "${each.value.PRE_COMMAND}"), null)
+        POST_COMMAND    = try(join(",", "${each.value.PRE_COMMAND}"), "")
     }
 
     provisioner "local-exec" {
@@ -29,7 +29,9 @@ resource "null_resource" "EXECUTE_SCRIPT" {
             export ${VARIANT}
             %{ endfor ~}
         %{ endif ~}
-        bash "${each.value.NAME}"
+        %{ if "${each.value.NAME}" != null ~}
+            bash "${each.value.NAME}"
+        %{ endif ~}
         "${each.value.POST_COMMAND}"
         EOF
     }
