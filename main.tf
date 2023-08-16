@@ -69,6 +69,7 @@ resource "null_resource" "EXECUTE_DESTROY_SCRIPT" {
     }
 
     provisioner "local-exec" {
+        when = destroy
         interpreter = ["bash", "-c"]
         command = <<-EOF
             %{ if self.triggers.PRE_COMMAND != "" ~}
