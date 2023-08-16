@@ -22,7 +22,6 @@ resource "null_resource" "EXECUTE_SCRIPT" {
 
     provisioner "local-exec" {
         command = <<-EOF
-        #!/bin/bash
         ${each.value.PRE_COMMAND}
         %{ if length("${each.value.VARIANTs}") > 0 ~}
             %{ for VARIANT in "${each.value.VARIANTs}" ~}
