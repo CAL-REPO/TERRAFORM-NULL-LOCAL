@@ -9,41 +9,48 @@ terraform {
     }
 }
 
-data "template_file" "SCRIPT" {
-    for_each = { for index, SCRIPT in var.SCRIPTs : index => SCRIPT }
-
-    # triggers = {
-    #     always_run      = try("${each.value.ALWAYS}" == true ? timestamp() : null, null)
-    #     PRE_COMMAND     = try("${each.value.PRE_COMMAND}", "")
-    #     VARAIANT        = try(join(",", "${each.value.VARIANTs}"), [])
-    #     NAME            = try(file("${each.value.NAME}"), null)
-    #     POST_COMMAND    = try("${each.value.PRE_COMMAND}", "")
-    # }
+data "template_file" "PRE_COMMAND_SCRIPT" {
+    count = (length(var.SCRIPTs) > 0 ?
+            length(var.SCRIPTs) : 0)
 
     template = <<-EOF
-    ${each.value.PRE_COMMAND}
-    %{ if length("${each.value.VARIANTs}") > 0 ~}
-        %{ for VARIANT in "${each.value.VARIANTs}" ~}
-        export ${VARIANT}
-        %{ endfor ~}
-    %{ endif ~}
-    %{ if "${each.value.NAME}" != null ~}
-        bash "${each.value.NAME}"
-    %{ endif ~}
-    ${each.value.POST_COMMAND}
+    ${var.SCRIPTs[count.index].PRE_COMMAND}
+    EOF
+}
+
+data "template_file" "POST_COMMAND_SCRIPT" {
+    count = (length(var.SCRIPTs) > 0 ?
+            length(var.SCRIPTs) : 0)
+
+    template = <<-EOF
+    ${var.SCRIPTs[count.index].POST_COMMAND}
     EOF
 }
 
 resource "null_resource" "EXECUTE_SCRIPT" {
-    count = (length("${data.template_file.SCRIPT}") > 0 ?
-            length("${data.template_file.SCRIPT}") : 0)
+    for_each = { for index, SCRIPT in var.SCRIPTs : index => SCRIPT }
 
     triggers = {
-        TEMPLATE_FILE = "${data.template_file.SCRIPT[count.index].rendered}"
+        always_run      = try("${each.value.ALWAYS}" == true ? timestamp() : null, null)
+        PRE_COMMAND_SCRIPT = "${data.template_file.SCRIPT[count.index].rendered}"
+        VARAIANT        = try(join(",", "${each.value.VARIANTs}"), [])
+        NAME            = try(file("${each.value.NAME}"), null)
+        POST_COMMAND_SCRIPT = "${data.template_file.SCRIPT[count.index].rendered}"
     }
 
     provisioner "local-exec" {
-        command = "bash ${self.triggers.TEMPLATE_FILE}"
+        command = <<-EOF
+        bash ${data.template_file.PRE_COMMAND_SCRIPT}
+        %{ if length("${each.value.VARIANTs}") > 0 ~}
+            %{ for VARIANT in "${each.value.VARIANTs}" ~}
+            export ${VARIANT}
+            %{ endfor ~}
+        %{ endif ~}
+        %{ if "${each.value.NAME}" != null ~}
+            bash "${each.value.NAME}"
+        %{ endif ~}
+        bash ${data.template_file.POST_COMMAND_SCRIPT}
+        EOF 
         interpreter = ["bash", "-c"]
     }
 }
