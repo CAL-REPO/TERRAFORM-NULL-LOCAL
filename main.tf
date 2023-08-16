@@ -45,7 +45,7 @@ resource "null_resource" "EXECUTE_SCRIPT" {
             %{ endfor ~}
         %{ endif ~}
         %{ if "${self.triggers.NAME}" != null ~}
-            bash "${var.SCRIPTs[count.index].NAME}"
+            bash "${self.triggers.NAME}"
         %{ endif ~}
         ${self.triggers.POST_COMMAND}
         EOF 
