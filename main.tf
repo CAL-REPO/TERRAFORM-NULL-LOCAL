@@ -9,7 +9,7 @@ terraform {
     }
 }
 
-data "template_file" "PRE_COMMAND_SCRIPT" {
+data "template_file" "APPLY_PRE_COMMAND_SCRIPT" {
     for_each = { for index, SCRIPT in var.APPLY_SCRIPTs : index => SCRIPT }
 
     template = <<-EOF
@@ -17,7 +17,7 @@ data "template_file" "PRE_COMMAND_SCRIPT" {
     EOF
 }
 
-data "template_file" "POST_COMMAND_SCRIPT" {
+data "template_file" "APPLY_POST_COMMAND_SCRIPT" {
     for_each = { for index, SCRIPT in var.APPLY_SCRIPTs : index => SCRIPT }
 
     template = <<-EOF
@@ -25,7 +25,7 @@ data "template_file" "POST_COMMAND_SCRIPT" {
     EOF
 }
 
-data "template_file" "PRE_COMMAND_SCRIPT" {
+data "template_file" "DESTROY_PRE_COMMAND_SCRIPT" {
     for_each = { for index, SCRIPT in var.DESTROY_SCRIPTs : index => SCRIPT }
 
     template = <<-EOF
@@ -33,7 +33,7 @@ data "template_file" "PRE_COMMAND_SCRIPT" {
     EOF
 }
 
-data "template_file" "POST_COMMAND_SCRIPT" {
+data "template_file" "DESTROY_POST_COMMAND_SCRIPT" {
     for_each = { for index, SCRIPT in var.DESTROY_SCRIPTs : index => SCRIPT }
 
     template = <<-EOF
@@ -46,10 +46,10 @@ resource "null_resource" "EXECUTE_APPLY_SCRIPT" {
 
     triggers = {
         always_run    = try("${each.value.ALWAYS}" == true ? timestamp() : null, null)
-        PRE_COMMAND   = try(data.template_file.PRE_COMMAND_SCRIPT[each.key].rendered, "")
+        PRE_COMMAND   = try(data.template_file.APPLY_PRE_COMMAND_SCRIPT[each.key].rendered, "")
         VARIANT       = try(join(",", "${each.value.VARIANTs}"), "")
         NAME          = try(file("${each.value.NAME}"), null)
-        POST_COMMAND  = try(data.template_file.POST_COMMAND_SCRIPT[each.key].rendered, "")
+        POST_COMMAND  = try(data.template_file.APPLY_POST_COMMAND_SCRIPT[each.key].rendered, "")
     }
 
     provisioner "local-exec" {
@@ -78,10 +78,10 @@ resource "null_resource" "EXECUTE_DESTROY_SCRIPT" {
 
     triggers = {
         always_run    = try("${each.value.ALWAYS}" == true ? timestamp() : null, null)
-        PRE_COMMAND   = try(data.template_file.PRE_COMMAND_SCRIPT[each.key].rendered, "")
+        PRE_COMMAND   = try(data.template_file.DESTROY_PRE_COMMAND_SCRIPT[each.key].rendered, "")
         VARIANT       = try(join(",", "${each.value.VARIANTs}"), "")
         NAME          = try(file("${each.value.NAME}"), null)
-        POST_COMMAND  = try(data.template_file.POST_COMMAND_SCRIPT[each.key].rendered, "")
+        POST_COMMAND  = try(data.template_file.DESTROY_POST_COMMAND_SCRIPT[each.key].rendered, "")
     }
 
     provisioner "local-exec" {
