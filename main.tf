@@ -13,7 +13,7 @@ data "template_file" "PRE_COMMAND_SCRIPT" {
     for_each = { for index, SCRIPT in var.SCRIPTs : index => SCRIPT }
 
     template = <<-EOF
-    ${try("${base64encode("${each.value.PRE_COMMAND}")}", "")}
+        ${try("${base64encode("${each.value.PRE_COMMAND}")}", "")}
     EOF
 }
 
@@ -21,7 +21,7 @@ data "template_file" "POST_COMMAND_SCRIPT" {
     for_each = { for index, SCRIPT in var.SCRIPTs : index => SCRIPT }
 
     template = <<-EOF
-    ${try("${base64encode("${each.value.POST_COMMAND_SCRIPT}")}", "")}
+        ${try("${base64encode("${each.value.POST_COMMAND}")}", "")}
     EOF
 }
 
@@ -37,24 +37,24 @@ resource "null_resource" "EXECUTE_SCRIPT" {
     }
 
     provisioner "local-exec" {
-    command = <<-EOF
-        %{ if self.triggers.PRE_COMMAND != "" ~}
-            echo "${self.triggers.PRE_COMMAND}" | base64 --decode | bash -s
-        %{ endif ~}
-        %{ if self.triggers.VARIANT != "" ~}
-            %{ for VARIANT in split(",", self.triggers.VARIANT) ~}
-            export ${VARIANT}
-            %{ endfor ~}
-        %{ endif ~}
-        %{ if self.triggers.NAME != null ~}
-            bash "${self.triggers.NAME}"
-        %{ endif ~}
-        %{ if self.triggers.POST_COMMAND != "" ~}
-            echo "${self.triggers.POST_COMMAND}" | base64 --decode | bash -s
-        %{ endif ~}
-    EOF 
-    interpreter = ["bash", "-c"]
-  }
+        command = <<-EOF
+            %{ if self.triggers.PRE_COMMAND != "" ~}
+                echo "${self.triggers.PRE_COMMAND}" | base64 --decode | bash -s
+            %{ endif ~}
+            %{ if self.triggers.VARIANT != "" ~}
+                %{ for VARIANT in split(",", self.triggers.VARIANT) ~}
+                export ${VARIANT}
+                %{ endfor ~}
+            %{ endif ~}
+            %{ if self.triggers.NAME != null ~}
+                bash "${self.triggers.NAME}"
+            %{ endif ~}
+            %{ if self.triggers.POST_COMMAND != "" ~}
+                echo "${self.triggers.POST_COMMAND}" | base64 --decode | bash -s
+            %{ endif ~}
+        EOF 
+        interpreter = ["bash", "-c"]
+    }
 }
 
 # resource "null_resource" "EXECUTE_SCRIPT" {
