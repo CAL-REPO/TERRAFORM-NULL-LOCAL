@@ -24,7 +24,7 @@ resource "null_resource" "EXECUTE_APPLY_SCRIPT" {
         interpreter = ["bash", "-c"]
         command = <<-EOF
             %{ if self.triggers.PRE_COMMAND != "" ~}
-                ${"${self.triggers.PRE_COMMAND}"}
+                "${self.triggers.PRE_COMMAND}"
             %{ endif ~}
             %{ if self.triggers.VARIANT != "" ~}
                 %{ for VARIANT in split(",", "${self.triggers.VARIANT}") ~}
@@ -35,7 +35,7 @@ resource "null_resource" "EXECUTE_APPLY_SCRIPT" {
                 bash "${self.triggers.NAME}"
             %{ endif ~}
             %{ if self.triggers.POST_COMMAND != "" ~}
-                ${"${self.triggers.POST_COMMAND}"}
+                "${self.triggers.POST_COMMAND}"
             %{ endif ~}
         EOF 
     }
