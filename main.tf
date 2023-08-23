@@ -57,7 +57,7 @@ resource "null_resource" "EXECUTE_CREATE_FILE" {
         %{ if self.triggers.TYPE == "utf-8" ~}
             echo "${self.triggers.CONTENT}" > "${each.value.FILENAME}"
         %{ endif ~}
-        %{ if self.triggers.TYPE == "utf-8" ~}
+        %{ if self.triggers.TYPE == "base64" ~}
             echo ${base64encode("${self.triggers.CONTENT}")} > "${each.value.FILENAME}"
         %{ endif ~}
         %{ if self.triggers.TYPE == "json" ~}
