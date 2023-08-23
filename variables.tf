@@ -14,6 +14,16 @@ variable "APPLY_SCRIPTs" {
     default = []
 }
 
+variable "CREATE_FILEs" {
+    type = list(object({
+        ALWAYS = optional(bool)
+        TYPE = optional(string)
+        FILENAME = string
+        CONTENT = string
+    }))
+    default = []
+}
+
 variable "DESTROY_SCRIPTs" {
     type = list(object({
         ALWAYS = optional(bool)

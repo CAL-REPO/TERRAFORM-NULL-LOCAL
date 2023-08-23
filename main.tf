@@ -41,6 +41,33 @@ resource "null_resource" "EXECUTE_APPLY_SCRIPT" {
     }
 }
 
+resource "null_resource" "EXECUTE_CREATE_FILE" {
+    for_each = { for index, FILE in var.CREATE_FILEs : index => FILE }
+
+    triggers = {
+        always_run  = try("${each.value.ALWAYS}" == true ? timestamp() : null, null)
+        TYPE        = try("${each.value.TYPE}", "utf-8")
+        FILENAME    = "${each.value.FILENAME}"
+        CONTENT     = try("${each.value.CONTENT}", "")
+    }
+
+    provisioner "local-exec" {
+        interpreter = ["bash", "-c"]
+        command = <<-EOF
+        %{ if self.triggers.TYPE == "utf-8" ~}
+            echo "${self.triggers.CONTENT}" > "${each.value.FILENAME}"
+        %{ endif ~}
+        %{ if self.triggers.TYPE == "base64" ~}
+            echo ${base64encode("${self.triggers.CONTENT}")} > "${each.value.FILENAME}"
+        %{ endif ~}
+        %{ if self.triggers.TYPE == "json" ~}
+            echo ${jsonencode("${self.triggers.CONTENT}")} > "${each.value.FILENAME}"
+        %{ endif ~}
+        EOF
+    }
+
+}
+
 # data "template_file" "DESTROY_PRE_COMMAND_SCRIPT" {
 #     for_each = { for index, SCRIPT in var.DESTROY_SCRIPTs : index => SCRIPT }
 
