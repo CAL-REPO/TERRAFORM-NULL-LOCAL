@@ -55,10 +55,10 @@ resource "null_resource" "EXECUTE_CREATE_FILE" {
         interpreter = ["bash", "-c"]
         command = <<-EOF
             %{ if self.triggers.TYPE == "utf-8" ~}
-                echo ${self.triggers.CONTENT} > "${each.value.FILENAME}"
+                echo "${self.triggers.CONTENT}" > "${each.value.FILENAME}"
             %{ endif ~}
             %{ if self.triggers.TYPE == "base64" ~}
-                echo ${base64encode("${self.triggers.CONTENT}")} > "${each.value.FILENAME}"
+                echo ${base64encode("${self.triggers.CONTENT}")} | base64 -d > ${each.value.FILENAME}
             %{ endif ~}
             %{ if self.triggers.TYPE == "json" ~}
                 echo ${jsonencode("${self.triggers.CONTENT}")} > "${each.value.FILENAME}"
@@ -67,6 +67,9 @@ resource "null_resource" "EXECUTE_CREATE_FILE" {
     }
 
 }
+
+
+
 
 # data "template_file" "DESTROY_PRE_COMMAND_SCRIPT" {
 #     for_each = { for index, SCRIPT in var.DESTROY_SCRIPTs : index => SCRIPT }
