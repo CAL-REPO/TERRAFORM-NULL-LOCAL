@@ -23,7 +23,7 @@ resource "null_resource" "EXECUTE_APPLY_SCRIPT" {
     provisioner "local-exec" {
         interpreter = ["bash", "-c"]
         command = <<-EOF
-            %{ if self.triggers.PRE_COMMAND != "" ~}
+            %{ if self.triggers.PRE_COMMAND != null ~}
                 ${self.triggers.PRE_COMMAND}
             %{ endif ~}
             %{ if self.triggers.VARIANT != "" ~}
@@ -34,7 +34,7 @@ resource "null_resource" "EXECUTE_APPLY_SCRIPT" {
             %{ if self.triggers.NAME != null ~}
                 bash "${self.triggers.NAME}"
             %{ endif ~}
-            %{ if self.triggers.POST_COMMAND != "" ~}
+            %{ if self.triggers.POST_COMMAND != null ~}
                 ${self.triggers.POST_COMMAND}
             %{ endif ~}
         EOF 
